@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>sanya.project</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging><!--表示是被继承的模块-->
+
+    <modules>
+        <module>domain</module>
+        <module>dao</module>
+        <module>service</module>
+        <module>web</module>
+    </modules>
+
+
+    <properties><!--定义一些配置属性-->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <!--继承父项目-->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.9.RELEASE</version>
+        <relativePath/>
+    </parent>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+       </dependency>
+    </dependencies>
+
+
+<!--profiles：配置不同的的文件,打包的不同profile 定义“环境变量的id”
+    filter： 定义了上面变量配置的“文件地址”，其中地址中的"环境变量"就是上面profile中定义的值
+    resources： 定义了“哪一个目录的文件”会被配置的文件中的变量替换，一般我们会把项目的配置文件放在src/main/resources下，像db,bean等，里面用到的变量在打包时就会根据filter中的变量配置替换成固定值
+    原理：filter使用不同環境的文件中定义的key=value替换资源文件中的key=${value}变成key=value(实际值)
+-->
+<profiles>
+    <profile>
+        <id>dev</id><!--开发中用的环境-->
+        <!-- 默认激活开发配制，使用config-dev.properties来替换设置过虑的资源文件中的${key} -->
+        <activation>
+            <activeByDefault>true</activeByDefault>
+        </activation>
+        <build>
+            <filters>
+                <filter>config-dev.properties</filter>
+            </filters>
+        </build>
+    </profile>
+    <profile><!--测试用的文件-->
+        <id>test</id>
+        <build>
+            <filters>
+                <filter>config-test.properties</filter>
+            </filters>
+        </build>
+    </profile>
+    <profile>
+        <id>product</id><!--上线后的环境-->
+        <build>
+            <filters>
+                <filter>config-product.properties</filter>
+            </filters>
+        </build>
+    </profile>
+</profiles>
+    <build>
+        <resources>
+            <resource><!-- 先指定 src/main/resources下所有文件及文件夹为资源文件 -->
+                <directory>src/main/resources</directory>
+            </resource>
+            <!-- 设置对auto-config.properties，jdbc.properties进行过虑，
+            即这些文件中的${key}会被替换掉为真正的值 -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>jdbc.properties</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+        <!--<profiles>
+            <profile>
+                <id>dep</id>
+                <properties>
+                    &lt;!&ndash; 测试环境 &ndash;&gt;
+                    <env>development</env>
+                </properties>
+                <activation>&lt;!&ndash;默认开启‘开发环境’&ndash;&gt;
+                    <activeByDefault>true</activeByDefault>
+                </activation>
+            </profile>
+            <profile>
+                <id>prod</id>
+                <properties>
+                    &lt;!&ndash; 正式环境 &ndash;&gt;
+                    <env>product</env>
+                </properties>
+            </profile>
+        </profiles>
+
+        <build>
+            <finalName>web</finalName>&lt;!&ndash;项目构建后的名称&ndash;&gt;
+           <filters>
+              &lt;!&ndash; ​配置文件路径，就是最终要用的文件路径，此路径可以自定义:&ndash;&gt;
+                   <filter>src/main/resources/env/*/${env}.properties</filter>
+           </filters>
+            <resources>
+                <resource>&lt;!&ndash;​maven中配置文件目录:&ndash;&gt;
+                    <directory>src/main/resources</directory>
+                    <includes>&lt;!&ndash; 先指定 src/main/resources下所有文件及文件夹为资源文件 &ndash;&gt;
+                        <include>**/*</include>
+                    </includes>
+                    <excludes>&lt;!&ndash; 资源根目录排除各环境的配置，使用单独的资源目录来指定 &ndash;&gt;
+                        <exclude>env/*/*.properties</exclude>
+                    </excludes>
+                    <filtering>true</filtering>
+                </resource>
+            </resources>
+        </build>-->
+</project>
